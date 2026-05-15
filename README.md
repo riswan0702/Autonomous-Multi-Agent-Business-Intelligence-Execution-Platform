@@ -1,10 +1,13 @@
-# 🤖 Autonomous Multi-Agent Business Intelligence & Execution Platform
+##  Live Demo
+https://www.loom.com/share/5282ff59792a42c7a930611fdb2c28bd
+
+#  Autonomous Multi-Agent Business Intelligence & Execution Platform
 
 > A production-grade AI system where 5 specialized agents collaborate autonomously to research, strategize, critique, plan, and validate complete business intelligence reports — in under 60 seconds.
 
 ---
 
-## 🎯 What It Does
+##  What It Does
 
 Give the platform a company description, product, audience, goals, and constraints.  
 It spins up a pipeline of 5 AI agents that work together like a small consulting firm:
@@ -13,17 +16,17 @@ It spins up a pipeline of 5 AI agents that work together like a small consulting
 > *"We are launching an AI-powered fitness app for working professionals in India. Create a GTM strategy, competitor analysis, pricing strategy, content plan, and growth experiments."*
 
 **Output:** A full BI report with:
-- 📊 Market sizing (TAM/SAM/SOM) + 6-competitor analysis
-- 🎯 GTM strategy with pricing tiers, channels, and messaging
-- 🗓️ 90-day execution roadmap (week-by-week tasks with owners)
-- 🔍 Hallucination check + assumption audit + confidence scores
-- ✅ QA scorecard with APPROVED / NEEDS REVISION verdict
+-  Market sizing (TAM/SAM/SOM) + 6-competitor analysis
+-  GTM strategy with pricing tiers, channels, and messaging
+-  90-day execution roadmap (week-by-week tasks with owners)
+-  Hallucination check + assumption audit + confidence scores
+-  QA scorecard with APPROVED / NEEDS REVISION verdict
 
 **Actual result:** QA Score 72/100 — generated in ~30 seconds using ~9,000 tokens.
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -60,7 +63,7 @@ It spins up a pipeline of 5 AI agents that work together like a small consulting
 
 ---
 
-## 🤖 Agent Roles
+##  Agent Roles
 
 | Agent | Responsibility | Model |
 |-------|---------------|-------|
@@ -76,7 +79,7 @@ It spins up a pipeline of 5 AI agents that work together like a small consulting
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Python 3.11+
@@ -129,7 +132,7 @@ Watch 5 agents run in real-time on the **Agent Timeline** tab, then see the full
 
 ---
 
-## ⚙️ Configuration
+##  Configuration
 
 All config lives in `backend/.env`:
 
@@ -144,7 +147,7 @@ All config lives in `backend/.env`:
 
 ---
 
-## 📡 API Reference
+##  API Reference
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -171,7 +174,7 @@ curl -X POST http://localhost:8000/api/run \
 
 ---
 
-## 🛡️ Security Features
+##  Security Features
 
 | Feature | Implementation |
 |---------|---------------|
@@ -184,21 +187,21 @@ curl -X POST http://localhost:8000/api/run \
 
 ---
 
-## 🔍 Observability
+##  Observability
 
 Every agent run is fully traced:
-- ✅ Start time, end time, latency (ms)
-- ✅ Token usage (input + output, per agent)
-- ✅ Model used per agent
-- ✅ Output preview (first 300 chars, redacted)
-- ✅ Error messages and retry counts
-- ✅ Structured JSON logs
+-  Start time, end time, latency (ms)
+-  Token usage (input + output, per agent)
+-  Model used per agent
+-  Output preview (first 300 chars, redacted)
+-  Error messages and retry counts
+-  Structured JSON logs
 
 All visible in the **Logs** tab of the dashboard and at `GET /api/run/{id}/logs`.
 
 ---
 
-## 🧱 Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -214,10 +217,10 @@ All visible in the **Logs** tab of the dashboard and at `GET /api/run/{id}/logs`
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
-agent-bi-gemini/
+agent-bi-fixed/
 ├── backend/
 │   ├── main.py                    # FastAPI app entry point
 │   ├── requirements.txt           # Python dependencies
@@ -257,7 +260,7 @@ agent-bi-gemini/
 
 ---
 
-## 🐳 Docker Deployment
+##  Docker Deployment
 
 ```bash
 # Copy env file
@@ -273,7 +276,7 @@ docker-compose up --build
 
 ---
 
-## 💡 Design Decisions
+##  Design Decisions
 
 **Why Groq instead of OpenAI/Gemini?**  
 Groq's free tier has no credit card requirement and provides very fast inference (typically <5s per agent). The OpenAI-compatible API means minimal code changes if you want to switch providers later.
@@ -289,7 +292,7 @@ SSE is simpler (standard HTTP), one-directional (server → client), and works t
 
 ---
 
-## 🔮 Potential Improvements
+## Potential Improvements
 
 - [ ] Live web search integration (Tavily/Serper) for real-time competitor data
 - [ ] PDF export of final report
@@ -301,6 +304,6 @@ SSE is simpler (standard HTTP), one-directional (server → client), and works t
 
 ---
 
-## 📄 License
+##  License
 
 MIT — free to use, modify, and distribute.
