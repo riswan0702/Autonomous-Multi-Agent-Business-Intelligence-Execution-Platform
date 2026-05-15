@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - MAX_TOKENS_PER_RUN=${MAX_TOKENS_PER_RUN:-80000}
+      - MAX_AGENT_LOOPS=${MAX_AGENT_LOOPS:-10}
+      - ENABLE_MEMORY=${ENABLE_MEMORY:-true}
+      - MEMORY_PATH=/app/memory_store
+    volumes:
+      - memory_data:/app/memory_store
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  memory_data:
