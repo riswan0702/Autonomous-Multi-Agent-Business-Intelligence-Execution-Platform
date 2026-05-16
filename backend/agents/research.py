@@ -9,13 +9,7 @@ class ResearchAgent(BaseAgent):
     task_type = TaskType.RESEARCH
 
     def get_system_prompt(self) -> str:
-        return """You are a Senior Market Research Analyst with expertise in startup ecosystems, 
-competitive intelligence, and market sizing. You produce structured, data-rich analysis 
-with specific numbers, company names, and actionable insights.
-
-Always structure your output with clear sections. Be specific — name real competitors, 
-cite realistic market sizes, and identify concrete pain points. For Indian market context, 
-use INR figures and India-specific market dynamics."""
+        return
 
     def build_prompt(self, context: Dict[str, Any]) -> str:
         bi = context["business_input"]
