@@ -1,11 +1,5 @@
 """
-API Routes:
-- POST /api/run — start a new BI workflow
-- GET /api/run/{run_id}/stream — SSE streaming of agent events
-- GET /api/run/{run_id} — get run status and final report
-- GET /api/runs — list all runs
-- GET /api/runs/{run_id}/logs — get full agent logs
-- GET /api/health — health check
+API Routes — all endpoints for the BI platform.
 """
 import asyncio
 import json
@@ -13,7 +7,6 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks
-from fastapi.responses import StreamingResponse
 from sse_starlette.sse import EventSourceResponse
 
 from core.schemas import BusinessInput, AgentStatus
@@ -23,7 +16,7 @@ from agents.orchestrator import OrchestratorAgent
 
 router = APIRouter()
 
-# In-memory event queues for SSE (run_id → asyncio.Queue)
+# In-memory event queues for SSE streaming
 _event_queues: dict[str, asyncio.Queue] = {}
 
 
@@ -70,7 +63,7 @@ async def start_run(
 
 
 async def _run_pipeline(run_id: str, business_input: dict, run_tracer):
-    """Background task that runs the full agent pipeline."""
+    """Background task — runs the full agent pipeline."""
     queue = _event_queues.get(run_id)
     orchestrator = OrchestratorAgent()
 
@@ -103,20 +96,18 @@ async def _run_pipeline(run_id: str, business_input: dict, run_tracer):
                 "timestamp": datetime.utcnow().isoformat(),
             })
     finally:
-        # Signal stream end
         if queue:
-            await queue.put(None)
+            await queue.put(None)  # signal stream end
 
 
 @router.get("/api/run/{run_id}/stream")
 async def stream_run(run_id: str, request: Request):
-    """SSE endpoint for real-time agent event streaming."""
+    """SSE endpoint — real-time agent event streaming."""
     queue = _event_queues.get(run_id)
     if not queue:
         raise HTTPException(status_code=404, detail="Run not found")
 
     async def event_generator():
-        # Send initial connection event
         yield {
             "event": "connected",
             "data": json.dumps({"run_id": run_id, "message": "Connected to agent stream"}),
@@ -146,12 +137,10 @@ async def stream_run(run_id: str, request: Request):
 
 @router.get("/api/run/{run_id}")
 async def get_run(run_id: str):
-    """Get run status, traces, and final report."""
+    """Get run status, agent traces, and final report."""
     run_tracer = get_run_tracer(run_id)
     if not run_tracer:
         raise HTTPException(status_code=404, detail="Run not found")
-
-    final_report = getattr(run_tracer, "_final_report", None)
 
     return {
         "run_id": run_id,
@@ -159,7 +148,7 @@ async def get_run(run_id: str):
         "created_at": run_tracer.created_at.isoformat(),
         "agent_traces": [t.model_dump() for t in run_tracer.get_traces()],
         "summary": run_tracer.get_summary(),
-        "final_report": final_report,
+        "final_report": getattr(run_tracer, "_final_report", None),
     }
 
 
@@ -171,7 +160,7 @@ async def list_all_runs():
 
 @router.get("/api/run/{run_id}/logs")
 async def get_logs(run_id: str):
-    """Get full agent logs for a run."""
+    """Full structured agent logs for a run."""
     run_tracer = get_run_tracer(run_id)
     if not run_tracer:
         raise HTTPException(status_code=404, detail="Run not found")
@@ -180,4 +169,38 @@ async def get_logs(run_id: str):
         "run_id": run_id,
         "logs": run_tracer.get_all_logs(),
         "summary": run_tracer.get_summary(),
+    }
+
+
+@router.get("/api/run/{run_id}/prompts")
+async def get_prompt_log(run_id: str):
+    """Full prompt log — every LLM call with prompts and responses (observability)."""
+    run_tracer = get_run_tracer(run_id)
+    if not run_tracer:
+        raise HTTPException(status_code=404, detail="Run not found")
+    orchestrator = getattr(run_tracer, "_orchestrator", None)
+    if orchestrator and hasattr(orchestrator, "router"):
+        return {
+            "run_id": run_id,
+            "prompt_log": orchestrator.router.get_prompt_log(),
+            "usage": orchestrator.router.get_usage_summary(),
+        }
+    return {"run_id": run_id, "prompt_log": [], "usage": {}}
+
+
+@router.get("/api/memory/stats")
+async def memory_stats():
+    """Memory store statistics — vector + conversation memory."""
+    from memory.vector_store import get_memory_store
+    return get_memory_store().get_stats()
+
+
+@router.get("/api/run/{run_id}/conversation")
+async def get_conversation(run_id: str):
+    """Conversation memory — all agent outputs for this run in sequence."""
+    from memory.vector_store import get_memory_store
+    store = get_memory_store()
+    return {
+        "run_id": run_id,
+        "conversation": store.get_conversation(run_id),
     }
