@@ -9,12 +9,7 @@ class StrategyAgent(BaseAgent):
     task_type = TaskType.STRATEGIC_REASONING
 
     def get_system_prompt(self) -> str:
-        return """You are a Chief Strategy Officer at a top-tier management consulting firm 
-(McKinsey/BCG caliber). You specialize in go-to-market strategy, growth frameworks, 
-and pricing for digital products in emerging markets, especially India.
-
-Your recommendations are bold, specific, and grounded in proven frameworks (Jobs-to-be-Done, 
-Blue Ocean, Growth Loops). You always back recommendations with reasoning and expected outcomes."""
+        return
 
     def build_prompt(self, context: Dict[str, Any]) -> str:
         bi = context["business_input"]
