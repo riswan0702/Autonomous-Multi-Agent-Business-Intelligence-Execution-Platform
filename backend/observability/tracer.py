@@ -6,6 +6,7 @@ Observability module:
 - Structured JSON logs
 - In-memory run store (production: replace with Redis/DB)
 """
+
 import json
 import time
 import uuid
@@ -158,7 +159,7 @@ class RunTracer:
         }
 
 
-# Global in-memory run store
+
 _run_store: Dict[str, RunTracer] = {}
 
 
