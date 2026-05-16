@@ -2,11 +2,12 @@
 Multi-Agent Business Intelligence Platform
 FastAPI Application Entry Point
 """
+
 import os
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 
-# Load .env FIRST before any other imports
+
 load_dotenv()
 
 from fastapi import FastAPI
@@ -39,7 +40,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS — allow frontend dev server and production build
+#  allow frontend dev server and production build
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
