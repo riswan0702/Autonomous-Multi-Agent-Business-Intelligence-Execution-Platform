@@ -1,0 +1,21 @@
+# Environment variables — NEVER commit real keys
+backend/.env
+backend/.env.local
+
+# Python
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.pyc
+backend/**/*.pyc
+backend/memory_store/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
