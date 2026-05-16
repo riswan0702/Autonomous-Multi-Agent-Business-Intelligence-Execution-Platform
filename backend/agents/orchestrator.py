@@ -47,6 +47,7 @@ class OrchestratorAgent:
         event_callback=None,
     ) -> Dict[str, Any]:
         run_tracer.status = AgentStatus.RUNNING
+        run_tracer._orchestrator = self  # for prompt log access via API
         context = {"business_input": business_input}
 
         # Pull relevant memories from past runs
@@ -59,7 +60,7 @@ class OrchestratorAgent:
         for step_key, AgentClass, description in self.PIPELINE:
             agent = AgentClass(self.router)
 
-            # FIX: check THEN increment (correct order prevents off-by-one)
+            # Check THEN increment (correct order prevents off-by-one)
             try:
                 loop_detector.check(run_id, agent.name)
             except SecurityError as e:
@@ -95,15 +96,20 @@ class OrchestratorAgent:
                     key = context_map[step_key]
                     context[key] = output.get(key, "")
 
-                # Persist to memory
+                # Get content to store
                 content_key = next(iter(output), step_key)
                 content = str(output.get(content_key, ""))
+
+                # Persist to vector memory
                 self.memory.store(
                     run_id=run_id,
                     agent_name=agent.name,
                     content=content,
                     metadata={"company": business_input.get("company", "")},
                 )
+
+                # Add to conversation memory for in-session recall
+                self.memory.add_to_conversation(run_id, agent.name, content)
 
                 if event_callback:
                     await event_callback("agent_complete", {
@@ -130,7 +136,7 @@ class OrchestratorAgent:
                     run_tracer.status = AgentStatus.FAILED
                     raise
 
-            # Small courtesy delay between agents
+            # Small delay between agents
             await asyncio.sleep(0.3)
 
         final_report = self._build_final_report(business_input, results, run_id)
