@@ -9,9 +9,7 @@ class QAAgent(BaseAgent):
     task_type = TaskType.QA
 
     def get_system_prompt(self) -> str:
-        return """You are a Quality Assurance Lead for a management consulting firm. 
-You validate that deliverables meet completeness, clarity, and actionability standards 
-before they go to clients. You provide a structured scorecard and final summary."""
+        return 
 
     def build_prompt(self, context: Dict[str, Any]) -> str:
         bi = context["business_input"]
